@@ -1,5 +1,15 @@
 FROM golang:1.13.4-buster AS build-env
 
+RUN ls
+
+COPY . /src
+
+RUN ls
+
+WORKDIR /src
+
+RUN ls
+
 ENV CGO_ENABLED=0
 
 RUN /src/script/build -o /tmp/hub
