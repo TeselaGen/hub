@@ -17,6 +17,8 @@ RUN /src/script/build -o /tmp/hub
 
 FROM alpine/git:1.0.7
 
+RUN apk update && apk add bash
+
 COPY --from=build-env /tmp/hub /usr/local/bin/hub
 
 ENTRYPOINT /usr/local/bin/hub
