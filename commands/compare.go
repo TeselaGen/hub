@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/github/hub/github"
-	"github.com/github/hub/utils"
+	"github.com/github/hub/v2/github"
+	"github.com/github/hub/v2/utils"
 )
 
 var cmdCompare = &Command{
@@ -30,7 +30,7 @@ compare [-uc] [<OWNER>] [<BASE>...]<HEAD>
 
 	[<BASE>...]<HEAD>
 		Branch names, tag names, or commit SHAs specifying the range to compare.
-		If a range with two dots ('A..B') is given, it will be transformed into a
+		If a range with two dots (''A..B'') is given, it will be transformed into a
 		range with three dots.
 
 		The <BASE> portion defaults to the default branch of the repository.
@@ -149,7 +149,6 @@ var compareUnescaper = strings.NewReplacer(
 func rangeQueryEscape(r string) string {
 	if strings.Contains(r, "..") {
 		return r
-	} else {
-		return compareUnescaper.Replace(url.QueryEscape(r))
 	}
+	return compareUnescaper.Replace(url.QueryEscape(r))
 }

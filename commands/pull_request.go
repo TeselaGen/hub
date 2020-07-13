@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/github/hub/git"
-	"github.com/github/hub/github"
-	"github.com/github/hub/utils"
+	"github.com/github/hub/v2/git"
+	"github.com/github/hub/v2/github"
+	"github.com/github/hub/v2/utils"
 )
 
 var cmdPullRequest = &Command{
@@ -32,10 +32,10 @@ pull-request -i <ISSUE>
 		request title, and the rest is used as pull request description in Markdown
 		format.
 
-		When multiple '--message' are passed, their values are concatenated with a
+		When multiple ''--message'' are passed, their values are concatenated with a
 		blank line in-between.
 
-		When neither '--message' nor '--file' were supplied, a text editor will open
+		When neither ''--message'' nor ''--file'' were supplied, a text editor will open
 		to author the title and description in.
 
 	--no-edit
@@ -44,11 +44,11 @@ pull-request -i <ISSUE>
 
 	-F, --file <FILE>
 		Read the pull request title and description from <FILE>. Pass "-" to read
-		from standard input instead. See '--message' for the formatting rules.
+		from standard input instead. See ''--message'' for the formatting rules.
 
 	-e, --edit
 		Open the pull request title and description in a text editor before
-		submitting. This can be used in combination with '--message' or '--file'.
+		submitting. This can be used in combination with ''--message'' or ''--file''.
 
 	-i, --issue <ISSUE>
 		Convert <ISSUE> (referenced by its number) to a pull request.
@@ -118,8 +118,8 @@ pull-request -i <ISSUE>
 
 ## Configuration:
 
-	* 'HUB_RETRY_TIMEOUT':
-		The maximum time to keep retrying after HTTP 422 on '--push' (default: 9).
+	* ''HUB_RETRY_TIMEOUT'':
+		The maximum time to keep retrying after HTTP 422 on ''--push'' (default: 9).
 
 ## See also:
 
@@ -372,8 +372,8 @@ of text is the title and the rest is the description.`, fullBase, fullHead))
 				if retryAllowance > 0 {
 					retryAllowance -= retryDelay
 					time.Sleep(time.Duration(retryDelay) * time.Second)
-					retryDelay += 1
-					numRetries += 1
+					retryDelay++
+					numRetries++
 				} else {
 					if numRetries > 0 {
 						duration := time.Since(startedAt)
@@ -392,7 +392,7 @@ of text is the title and the rest is the description.`, fullBase, fullHead))
 
 		utils.Check(err)
 
-		pullRequestURL = pr.HtmlUrl
+		pullRequestURL = pr.HTMLURL
 
 		params = map[string]interface{}{}
 		flagPullRequestLabels := commaSeparated(args.Flag.AllValues("--labels"))
@@ -475,6 +475,9 @@ func parsePullRequestIssueNumber(url string) string {
 func commaSeparated(l []string) []string {
 	res := []string{}
 	for _, i := range l {
+		if i == "" {
+			continue
+		}
 		res = append(res, strings.Split(i, ",")...)
 	}
 	return res

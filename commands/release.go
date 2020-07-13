@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/github/hub/github"
-	"github.com/github/hub/ui"
-	"github.com/github/hub/utils"
+	"github.com/github/hub/v2/github"
+	"github.com/github/hub/v2/ui"
+	"github.com/github/hub/v2/utils"
 )
 
 var (
@@ -30,13 +30,10 @@ release delete <TAG>
 
 With no arguments, shows a list of existing releases.
 
-With '--include-drafts', include draft releases in the listing.
-With '--exclude-prereleases', exclude non-stable releases from the listing.
-
 	* _show_:
 		Show GitHub release notes for <TAG>.
 
-		With '--show-downloads', include the "Downloads" section.
+		With ''--show-downloads'', include the "Downloads" section.
 
 	* _create_:
 		Create a GitHub release for the specified <TAG> name. If git tag <TAG>
@@ -44,11 +41,11 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 
 	* _edit_:
 		Edit the GitHub release for the specified <TAG> name. Accepts the same
-		options as _create_ command. Publish a draft with '--draft=false'.
+		options as _create_ command. Publish a draft with ''--draft=false''.
 
-		Without '--message' or '--file', a text editor will open pre-populated with
+		Without ''--message'' or ''--file'', a text editor will open pre-populated with
 		the current release title and body. To re-use existing title and body
-		unchanged, pass '-m ""'.
+		unchanged, pass ''-m ""''.
 
 	* _download_:
 		Download the assets attached to release for the specified <TAG>.
@@ -58,6 +55,12 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 		this does **not** remove the git tag <TAG>.
 
 ## Options:
+	-d, --include-drafts
+		List drafts together with published releases.
+
+	-p, --exclude-prereleases
+		Exclude prereleases from the list.
+
 	-L, --limit
 		Display only the first <LIMIT> releases.
 
@@ -70,26 +73,26 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 	-a, --attach <FILE>
 		Attach a file as an asset for this release.
 
-		If <FILE> is in the "<filename>#<text>" format, the text after the '#'
+		If <FILE> is in the "<filename>#<text>" format, the text after the "#"
 		character is taken as asset label.
 
 	-m, --message <MESSAGE>
 		The text up to the first blank line in <MESSAGE> is treated as the release
 		title, and the rest is used as release description in Markdown format.
 
-		When multiple '--message' are passed, their values are concatenated with a
+		When multiple ''--message'' are passed, their values are concatenated with a
 		blank line in-between.
 
-		When neither '--message' nor '--file' were supplied to 'release create', a
+		When neither ''--message'' nor ''--file'' were supplied to ''release create'', a
 		text editor will open to author the title and description in.
 
 	-F, --file <FILE>
 		Read the release title and description from <FILE>. Pass "-" to read from
-		standard input instead. See '--message' for the formatting rules.
+		standard input instead. See ''--message'' for the formatting rules.
 
 	-e, --edit
 		Open the release title and description in a text editor before submitting.
-		This can be used in combination with '--message' or '--file'.
+		This can be used in combination with ''--message'' or ''--file''.
 
 	-o, --browse
 		Open the new release in a web browser.
@@ -100,7 +103,7 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 	-t, --commitish <TARGET>
 		A commit SHA or branch name to attach the release to, only used if <TAG>
 		does not already exist (default: main branch).
-	
+
 	-i, --include <PATTERN>
 		Filter the files in the release to those that match the glob <PATTERN>.
 
@@ -151,7 +154,7 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 
 	--color[=<WHEN>]
 		Enable colored output even if stdout is not a terminal. <WHEN> can be one
-		of "always" (default for '--color'), "never", or "auto" (default).
+		of "always" (default for ''--color''), "never", or "auto" (default).
 
 	<TAG>
 		The git tag name for this release.
@@ -295,14 +298,14 @@ func formatRelease(release github.Release, format string, colorize bool) string 
 
 	assets := make([]string, len(release.Assets))
 	for i, asset := range release.Assets {
-		assets[i] = fmt.Sprintf("%s\t%s", asset.DownloadUrl, asset.Label)
+		assets[i] = fmt.Sprintf("%s\t%s", asset.DownloadURL, asset.Label)
 	}
 
 	placeholders := map[string]string{
-		"U":  release.HtmlUrl,
-		"uT": release.TarballUrl,
-		"uZ": release.ZipballUrl,
-		"uA": release.UploadUrl,
+		"U":  release.HTMLURL,
+		"uT": release.TarballURL,
+		"uZ": release.ZipballURL,
+		"uA": release.UploadURL,
 		"S":  state,
 		"sC": stateColorSwitch,
 		"t":  release.Name,
@@ -362,11 +365,11 @@ func showRelease(cmd *Command, args *Args) {
 		if args.Flag.Bool("--show-downloads") {
 			ui.Printf("\n## Downloads\n\n")
 			for _, asset := range release.Assets {
-				ui.Println(asset.DownloadUrl)
+				ui.Println(asset.DownloadURL)
 			}
-			if release.ZipballUrl != "" {
-				ui.Println(release.ZipballUrl)
-				ui.Println(release.TarballUrl)
+			if release.ZipballURL != "" {
+				ui.Println(release.ZipballURL)
+				ui.Println(release.TarballURL)
 			}
 		}
 	}
@@ -421,7 +424,7 @@ func downloadRelease(cmd *Command, args *Args) {
 }
 
 func downloadReleaseAsset(asset github.ReleaseAsset, gh *github.Client) (err error) {
-	assetReader, err := gh.DownloadReleaseAsset(asset.ApiUrl)
+	assetReader, err := gh.DownloadReleaseAsset(asset.APIURL)
 	if err != nil {
 		return
 	}
@@ -511,7 +514,7 @@ text is the title and the rest is the description.`, tagName, project))
 
 		flagReleaseBrowse := args.Flag.Bool("--browse")
 		flagReleaseCopy := args.Flag.Bool("--copy")
-		printBrowseOrCopy(args, release.HtmlUrl, flagReleaseBrowse, flagReleaseCopy)
+		printBrowseOrCopy(args, release.HTMLURL, flagReleaseBrowse, flagReleaseCopy)
 	}
 
 	messageBuilder.Cleanup()
@@ -593,7 +596,7 @@ text is the title and the rest is the description.`, tagName, project))
 		messageBuilder.Edit = args.Flag.Bool("--edit")
 	} else {
 		messageBuilder.Edit = true
-		messageBuilder.Message = fmt.Sprintf("%s\n\n%s", release.Name, release.Body)
+		messageBuilder.Message = strings.Replace(fmt.Sprintf("%s\n\n%s", release.Name, release.Body), "\r\n", "\n", -1)
 	}
 
 	title, body, err := messageBuilder.Extract()
